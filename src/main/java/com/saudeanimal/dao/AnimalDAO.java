@@ -22,6 +22,8 @@ public class AnimalDAO implements DAO<Animal> {
     private static final String BUSCAR_POR_ID = "SELECT * FROM Animal WHERE IdAnimal = ?";
     private static final String LISTAR_TODOS = "SELECT * FROM Animal ORDER BY Nome";
     private static final String BUSCAR_POR_NOME = "SELECT * FROM Animal WHERE Nome LIKE ? ORDER BY Nome";
+    private static final String LISTAR_POR_SURTO =
+            "SELECT a.* FROM Animal a JOIN AnimalSurto s ON s.IdAnimal = a.IdAnimal WHERE s.IdSurto = ? ORDER BY a.Nome";
 
     @Override
     public void inserir(Animal animal) {
@@ -102,6 +104,22 @@ public class AnimalDAO implements DAO<Animal> {
             }
         } catch (SQLException e) {
             throw new DaoException("Erro ao buscar animais por nome", e);
+        }
+        return animais;
+    }
+
+    public List<Animal> listarPorSurto(int idSurto) {
+        List<Animal> animais = new ArrayList<>();
+        try (Connection con = Conexao.abrir();
+             PreparedStatement ps = con.prepareStatement(LISTAR_POR_SURTO)) {
+            ps.setInt(1, idSurto);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    animais.add(mapear(rs));
+                }
+            }
+        } catch (SQLException e) {
+            throw new DaoException("Erro ao listar animais do surto", e);
         }
         return animais;
     }

@@ -45,3 +45,13 @@ CREATE TABLE IF NOT EXISTS SurtosDoencas (
     DataInicio DATE NOT NULL,
     DataFim DATE
 ) ENGINE=InnoDB;
+
+CREATE TABLE IF NOT EXISTS AnimalSurto (
+    IdAnimal INT NOT NULL,
+    IdSurto INT NOT NULL,
+    PRIMARY KEY (IdAnimal, IdSurto),
+    CONSTRAINT FK_AnimalSurto_Animal FOREIGN KEY (IdAnimal)
+        REFERENCES Animal (IdAnimal) ON DELETE CASCADE,
+    CONSTRAINT FK_AnimalSurto_Surto FOREIGN KEY (IdSurto)
+        REFERENCES SurtosDoencas (IdSurto) ON DELETE CASCADE
+) ENGINE=InnoDB;

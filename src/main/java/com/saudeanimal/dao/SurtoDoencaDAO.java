@@ -21,6 +21,8 @@ public class SurtoDoencaDAO implements DAO<SurtoDoenca> {
     private static final String EXCLUIR = "DELETE FROM SurtosDoencas WHERE IdSurto = ?";
     private static final String BUSCAR_POR_ID = "SELECT * FROM SurtosDoencas WHERE IdSurto = ?";
     private static final String LISTAR_TODOS = "SELECT * FROM SurtosDoencas ORDER BY DataInicio DESC";
+    private static final String LISTAR_POR_ANIMAL =
+            "SELECT d.* FROM SurtosDoencas d JOIN AnimalSurto s ON s.IdSurto = d.IdSurto WHERE s.IdAnimal = ? ORDER BY d.DataInicio DESC";
 
     @Override
     public void inserir(SurtoDoenca surto) {
@@ -89,6 +91,22 @@ public class SurtoDoencaDAO implements DAO<SurtoDoenca> {
             }
         } catch (SQLException e) {
             throw new DaoException("Erro ao listar surtos de doenças", e);
+        }
+        return surtos;
+    }
+
+    public List<SurtoDoenca> listarPorAnimal(int idAnimal) {
+        List<SurtoDoenca> surtos = new ArrayList<>();
+        try (Connection con = Conexao.abrir();
+             PreparedStatement ps = con.prepareStatement(LISTAR_POR_ANIMAL)) {
+            ps.setInt(1, idAnimal);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    surtos.add(mapear(rs));
+                }
+            }
+        } catch (SQLException e) {
+            throw new DaoException("Erro ao listar surtos do animal", e);
         }
         return surtos;
     }
